@@ -57,16 +57,15 @@ CMD ["node", "--harmony", "index.js"]
 
 ```javascript
   docker run \
-    -e NODE_ENV=test \
     -e url='http://stackoverflow.com' \
     -e selector='#hlogo' \
     phantomjs-query
 ```
-
+It outputs
 ```
 Stack Overflow
 ```
-
+which is the text context of the element selected with `#hlogo`
 ```html
 <div id="hlogo">
     <a href="/">
