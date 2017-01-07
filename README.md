@@ -22,9 +22,8 @@ CMD ["node", "--harmony", "index.js"]
 
 ```javascript
   docker run \
-    -d \
     -e NODE_ENV=test \
-    -e url='https://www.argos.co.uk/stores' \
+    -e url='http://www.argos.co.uk/stores' \
     -e selector='.store_list_data a' \
     phantomjs-query
 ```
