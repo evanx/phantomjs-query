@@ -1,6 +1,8 @@
 
 # phantomjs-query
 
+A containerised utility to query HTML document element text content from a URL using PhantomJS.
+
 ```javascript
 async function start() {
     const instance = await phantom.create([], {logger: {}});
