@@ -3,6 +3,27 @@
 
 A containerised utility to query HTML document element text content from a URL using PhantomJS.
 
+## Config
+
+```javascript
+const configMeta = {
+    url: {
+        description: 'URL to scrape',
+        example: 'http://stackoverflow.com',
+    },
+    selector: {
+        description: 'Query selector',
+        example: '#hlogo'
+    },
+    allowDomain: {
+        required: false,
+        description: 'Sole resource domain',
+        example: 'stackoverflow.com'
+    }
+};
+```
+
+## Implementation
 ```javascript
 async function start() {
     const instance = await phantom.create([], {logger: {}});
@@ -34,6 +55,27 @@ const querySelectorTextContentTrim = function(selector) {
         }
     }
 };
+```
+
+Otherwise an error will be thrown e.g.
+```Error: Missing required config: selector: Query selector e.g. '#hlogo'
+```
+by
+```javascript
+const config = Object.keys(configMeta).reduce((config, key) => {
+    if (process.env[key]) {
+        const value = process.env[key];
+        assert(value.length, key);
+        config[key] = value;
+    } else if (configDefault[key]) {
+    } else {
+        const meta = configMeta[key];
+        if (meta.required !== false) {
+            throw new Error(`Missing required config: ${key}: ${meta.description} e.g. '${meta.example}'`);
+        }
+    }
+    return config;
+}, configDefault);
 ```
 
 ## Build application container
