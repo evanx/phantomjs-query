@@ -12,12 +12,12 @@ const configMeta = {
         example: 'http://stackoverflow.com',
     },
     selector: {
-        description: 'Query selector',
+        description: 'element query selector',
         example: '#hlogo'
     },
     allowDomain: {
         required: false,
-        description: 'Sole resource domain',
+        description: 'only allowed resource domain',
         example: 'stackoverflow.com'
     }
 };
@@ -60,7 +60,7 @@ const querySelectorTextContentTrim = function(selector) {
 
 Otherwise an error will be thrown e.g.
 ```
-Error: Missing required config: selector: Query selector e.g. '#hlogo'
+Error: Missing required config: 'selector' for the element query selector e.g. '#hlogo'
 ```
 by
 ```javascript
@@ -73,7 +73,8 @@ const config = Object.keys(configMeta).reduce((config, key) => {
     } else {
         const meta = configMeta[key];
         if (meta.required !== false) {
-            throw new Error(`Missing required config: ${key}: ${meta.description} e.g. '${meta.example}'`);
+            throw new Error(`Missing required config: '${key}'
+                for the ${meta.description} e.g. '${meta.example}'`);
         }
     }
     return config;

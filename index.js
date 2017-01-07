@@ -12,12 +12,12 @@ const configMeta = {
         example: 'http://stackoverflow.com',
     },
     selector: {
-        description: 'Query selector',
+        description: 'element query selector',
         example: '#hlogo'
     },
     allowDomain: {
         required: false,
-        description: 'Sole resource domain',
+        description: 'only allowed resource domain',
         example: 'stackoverflow.com'
     }
 };
@@ -31,7 +31,9 @@ const config = Object.keys(configMeta).reduce((config, key) => {
     } else {
         const meta = configMeta[key];
         if (meta.required !== false) {
-            throw new Error(`Missing required config: ${key}: ${meta.description} e.g. '${meta.example}'`);
+            throw new Error(
+                `Missing required config: '${key}' for the ${meta.description} e.g. '${meta.example}'`
+            );
         }
     }
     return config;
