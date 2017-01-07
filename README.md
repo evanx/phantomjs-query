@@ -65,7 +65,7 @@ It outputs
 ```
 Stack Overflow
 ```
-which is the text context of the element selected with `#hlogo`
+where this is the text context of the element for selector `#hlogo`
 ```html
 <div id="hlogo">
     <a href="/">
@@ -73,3 +73,4 @@ which is the text context of the element selected with `#hlogo`
     </a>
 </div>
 ```
+via `http://stackoverflow.com`
