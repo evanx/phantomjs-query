@@ -24,6 +24,7 @@ const configMeta = {
 ```
 
 ## Implementation
+
 ```javascript
 async function start() {
     const instance = await phantom.create([], {logger: {}});
@@ -58,7 +59,8 @@ const querySelectorTextContentTrim = function(selector) {
 ```
 
 Otherwise an error will be thrown e.g.
-```Error: Missing required config: selector: Query selector e.g. '#hlogo'
+```
+Error: Missing required config: selector: Query selector e.g. '#hlogo'
 ```
 by
 ```javascript
