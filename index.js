@@ -24,8 +24,12 @@ const config = Object.keys(configMeta).reduce((config, key) => {
         const value = process.env[key];
         assert(value.length, key);
         config[key] = value;
-    } else if (!configDefault[key] && configMeta[key].required !== false) {
-        throw new Error('config: ' + key);
+    } else if (configDefault[key]) {
+    } else {
+        const meta = configMeta[key];
+        if (meta.required !== false) {
+            throw new Error(`Missing required config: ${key} - ${meta.description}`);
+        }
     }
     return config;
 }, configDefault);
