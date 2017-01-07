@@ -64,3 +64,11 @@ CMD ["node", "--harmony", "index.js"]
 ```
 Stack Overflow
 ```
+
+```html
+<div id="hlogo">
+    <a href="/">
+        Stack Overflow
+    </a>
+</div>
+```
