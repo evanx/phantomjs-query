@@ -31,9 +31,11 @@ const config = Object.keys(configMeta).reduce((config, key) => {
     } else {
         const meta = configMeta[key];
         if (meta.required !== false) {
-            throw new Error(
-                `Missing required config: '${key}' for the ${meta.description} e.g. '${meta.example}'`
-            );
+            throw new Error([
+                `Missing required config:`,
+                `'${key}' for the ${meta.description}`,
+                `e.g. '${meta.example}'`
+            ].join(' '));
         }
     }
     return config;

@@ -3,6 +3,7 @@
 
 A containerised utility to query HTML document element text content from a URL using PhantomJS.
 
+
 ## Config
 
 ```javascript
@@ -22,6 +23,7 @@ const configMeta = {
     }
 };
 ```
+
 
 ## Implementation
 
@@ -60,7 +62,7 @@ const querySelectorTextContentTrim = function(selector) {
 
 Otherwise an error will be thrown e.g.
 ```
-Error: Missing required config: 'selector' for the element query selector e.g. '#hlogo'
+Error: Missing required config: 'url' for the URL to scrape e.g. 'http://stackoverflow.com'
 ```
 by
 ```javascript
@@ -73,13 +75,17 @@ const config = Object.keys(configMeta).reduce((config, key) => {
     } else {
         const meta = configMeta[key];
         if (meta.required !== false) {
-            throw new Error(`Missing required config: '${key}'
-                for the ${meta.description} e.g. '${meta.example}'`);
+            throw new Error([
+                `Missing required config:`,
+                `'${key}' for the ${meta.description}`,
+                `e.g. '${meta.example}'`
+            ].join(' '));
         }
     }
     return config;
 }, configDefault);
 ```
+
 
 ## Build application container
 
@@ -97,6 +103,7 @@ RUN npm install
 ADD index.js .
 CMD ["node", "--harmony", "index.js"]
 ```
+
 
 ## Docker run
 
