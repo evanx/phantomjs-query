@@ -3,6 +3,38 @@
 
 A containerised utility to query HTML document element text content from a URL using PhantomJS.
 
+## Primary examples
+
+### Query element text
+
+```javascript
+  docker run \
+    -e url='http://stackoverflow.com' \
+    -e selector='#hlogo' \
+    phantomjs-query
+```
+outputs
+```
+Stack Overflow
+```
+
+### Query multiple element text
+
+For `document.querySelectAll()` use `query='all'`
+```
+$ docker run -e url='https://news.ycombinator.com/' -e selector='a.storylink' \
+  -e query='all' phantomjs-query | head
+```
+```
+Car allergic to vanilla ice cream (2000)
+Chernobyl's new sarcophagus
+Challenging Clojure in Common Lisp
+Memory Deduplication: The Curse that Keeps on Giving [video]
+GitHub Enterprise SQL Injection
+Cryptanalysis with Reasoning Systems
+Bootstrapping a slightly more secure [video]
+Stars may collide in a "red nova" in 2022
+```
 
 ## Config
 
@@ -13,13 +45,42 @@ const configMeta = {
         example: 'http://stackoverflow.com',
     },
     selector: {
-        description: 'element query selector',
+        description: 'element CSS selector',
         example: '#hlogo'
+    },
+    query: {
+        default: 'first',
+        description: 'elements to select',
+        options: ['first', 'last', 'all']
+    },
+    type: {
+        default: 'text',
+        description: 'element property type',
+        options: ['text', 'html']
     },
     allowDomain: {
         required: false,
         description: 'only allowed resource domain',
         example: 'stackoverflow.com'
+    },
+    output: {
+        default: 'plain',
+        description: 'output content',
+        options: ['plain', 'json']
+    },
+    format: {
+        default: 'plain',
+        description: 'output format',
+        options: ['plain', 'indent']
+    },
+    level: {
+        required: false,
+        description: 'logging level',
+        options: ['debug', 'info', 'warn', 'error']
+    },
+    debug: {
+        default: false,
+        description: 'logging of query in PhantomJS'
     }
 };
 ```

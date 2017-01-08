@@ -114,7 +114,7 @@ const querySelector = function(config) {
                 const element = elements[i];
                 if (config.type === 'text') {
                     results.push(element.textContent.trim());
-                } else {
+                } else if (config.type === 'html') {
                     results.push(element.innerHTML.trim());
                 }
             }
@@ -128,7 +128,7 @@ const querySelector = function(config) {
                 const element = elements[i];
                 if (config.type === 'text') {
                     results.push(element.textContent.trim());
-                } else {
+                } else if (config.type === 'html') {
                     results.push(element.innerHTML.trim());
                 }
             }
