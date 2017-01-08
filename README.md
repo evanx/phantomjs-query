@@ -64,6 +64,8 @@ where `format='indent'` pretty prints:
 Note that `format` may to omitted for `plain` JSON formatting
 
 Altogether, see https://raw.githubusercontent.com/evanx/phantomjs-query/master/test.sh
+
+If it looks suitable for some test environment, then risk the following:
 ```
 curl -s https://raw.githubusercontent.com/evanx/phantomjs-query/master/test.sh | bash -x
 ````

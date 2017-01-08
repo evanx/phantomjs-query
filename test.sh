@@ -1,4 +1,6 @@
 
+curl -s https://raw.githubusercontent.com/evanx/phantomjs-query/master/test.sh
+
 curl -s https://raw.githubusercontent.com/evanx/phantomjs-query/master/Dockerfile
 
 docker build -t phantomjs-query https://github.com/evanx/phantomjs-query.git
