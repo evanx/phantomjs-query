@@ -1,7 +1,7 @@
 
 # phantomjs-query
 
-A containerised utility to query HTML document element text content from a URL using PhantomJS.
+A containerised utility to query HTML document elements using PhantomJS.
 
 ## Primary examples
 
