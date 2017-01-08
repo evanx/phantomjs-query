@@ -18,15 +18,25 @@ const configMeta = {
         description: 'elements to select',
         options: ['first', 'last', 'all']
     },
-    render: {
+    type: {
         default: 'text',
-        description: 'render property',
+        description: 'element property type',
         options: ['text', 'html']
     },
     allowDomain: {
         required: false,
         description: 'only allowed resource domain',
         example: 'stackoverflow.com'
+    },
+    output: {
+        default: 'plain',
+        description: 'output content',
+        options: ['plain', 'json']
+    },
+    format: {
+        default: 'plain',
+        description: 'output format',
+        options: ['plain', 'indent']
     },
     level: {
         required: false,
@@ -87,12 +97,12 @@ const querySelector = function(config) {
     if (config.query === 'first') {
         var element = document.querySelector(config.selector);
         if (element) {
-            if (config.render === 'text') {
+            if (config.type === 'text') {
                 var text = element.textContent.trim();
                 if (text.length) {
                     return text;
                 }
-            } else if (config.render === 'html') {
+            } else if (config.type === 'html') {
                 return element.innerHTML.trim();
             }
         }
@@ -102,7 +112,7 @@ const querySelector = function(config) {
             const results = [];
             for (var i = 0; i < elements.length; i++) {
                 const element = elements[i];
-                if (config.render === 'text') {
+                if (config.type === 'text') {
                     results.push(element.textContent.trim());
                 } else {
                     results.push(element.innerHTML.trim());
@@ -116,7 +126,7 @@ const querySelector = function(config) {
             const results = [];
             for (var i = 0; i < elements.length; i++) {
                 const element = elements[i];
-                if (config.render === 'text') {
+                if (config.type === 'text') {
                     results.push(element.textContent.trim());
                 } else {
                     results.push(element.innerHTML.trim());
@@ -143,8 +153,14 @@ async function start() {
         assert.equal(status, 'success');
         const content = await page.property('content');
         const results = await page.evaluate(querySelector, config);
-        if (lodash.isArray(results)) {
-            console.log(results.length);
+        if (config.output === 'json') {
+            if (config.format === 'indent') {
+                console.log(JSON.stringify(results, null, 2));
+            } else {
+                console.log(JSON.stringify(results));
+            }
+        } else if (lodash.isArray(results)) {
+            results.forEach(result => console.log(result));
         } else {
             console.log(results);
         }
