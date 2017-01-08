@@ -1,6 +1,6 @@
 {
   "name": "phantomjs-query",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A service to select element from a document loaded by PhantomJS.",
   "main": "index.js",
   "scripts": {
