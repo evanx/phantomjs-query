@@ -3,7 +3,12 @@
 
 A containerised utility to query HTML document elements using PhantomJS.
 
-## Primary examples
+## Test examples
+
+Build docker image from Github repo
+```
+docker build -t phantomjs-query https://github.com/evanx/phantomjs-query.git
+```
 
 ### Query element text
 
@@ -54,6 +59,21 @@ docker run \
   phantomjs-query | head
 ```
 where `format` may to omitted for `plain` JSON formatting
+
+The above tests algother via `test.sh`
+```shell
+  docker build -t phantomjs-query https://github.com/evanx/phantomjs-query.git
+  docker run phantomjs-query bash test.sh   
+```
+
+Alternatively
+```
+  git clone https://github.com/evanx/phantomjs-query &&
+  cd phantomjs-query &&
+  npm install &&
+  bash -x test.sh
+```
+See https://github.com/evanx/phantomjs-query/blob/master/test.sh
 
 ## Config
 
