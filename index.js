@@ -2,9 +2,7 @@
 const assert = require('assert');
 const phantom = require('phantom');
 const lodash = require('lodash');
-
-const configDefault = {
-};
+const logger = require('winston');
 
 const configMeta = {
     url: {
@@ -12,22 +10,43 @@ const configMeta = {
         example: 'http://stackoverflow.com',
     },
     selector: {
-        description: 'element query selector',
+        description: 'element CSS selector',
         example: '#hlogo'
+    },
+    query: {
+        default: 'first',
+        description: 'elements to select',
+        options: ['first', 'last', 'all']
+    },
+    render: {
+        default: 'text',
+        description: 'render property',
+        options: ['text', 'html']
     },
     allowDomain: {
         required: false,
         description: 'only allowed resource domain',
         example: 'stackoverflow.com'
+    },
+    level: {
+        required: false,
+        description: 'logging level',
+        options: ['debug', 'info', 'warn', 'error']
+    },
+    debug: {
+        default: false,
+        description: 'logging of query in PhantomJS'
     }
 };
 
 const config = Object.keys(configMeta).reduce((config, key) => {
+    const meta = configMeta[key];
     if (process.env[key]) {
         const value = process.env[key];
         assert(value.length, key);
         config[key] = value;
-    } else if (configDefault[key]) {
+    } else if (meta.default !== undefined) {
+        config[key] = meta.default;
     } else {
         const meta = configMeta[key];
         if (meta.required !== false) {
@@ -39,9 +58,16 @@ const config = Object.keys(configMeta).reduce((config, key) => {
         }
     }
     return config;
-}, configDefault);
+}, {});
+
+async function debug() {
+    if (process.env.NODE_ENV !== 'production') {
+        console.log([].slice.call(arguments));
+    }
+}
 
 const onResourceRequestedAllowDomain = function(requestData, networkRequest, allowDomain) {
+    console.log('allowDomain', allowDomain);
     var match = (requestData.url.match(/\/\/([^\/]+)\/.*\/([^\/]+)$/) || []);
     var domain = match[1];
     var file = match[2];
@@ -56,18 +82,58 @@ const onResourceRequestedAllowDomain = function(requestData, networkRequest, all
     }
 };
 
-const querySelectorTextContentTrim = function(selector) {
-    var element = document.querySelector(selector);
-    if (element) {
-        var text = element.textContent.trim();
-        if (text.length) {
-            return text;
+const querySelector = function(config) {
+    console.log('querySelector', config);
+    if (config.query === 'first') {
+        var element = document.querySelector(config.selector);
+        if (element) {
+            if (config.render === 'text') {
+                var text = element.textContent.trim();
+                if (text.length) {
+                    return text;
+                }
+            } else if (config.render === 'html') {
+                return element.innerHTML.trim();
+            }
         }
+    } else if (config.query === 'all') {
+        var elements = document.querySelectorAll(config.selector);
+        if (elements) {
+            const results = [];
+            for (var i = 0; i < elements.length; i++) {
+                const element = elements[i];
+                if (config.render === 'text') {
+                    results.push(element.textContent.trim());
+                } else {
+                    results.push(element.innerHTML.trim());
+                }
+            }
+            return results;
+        }
+    } else if (config.query === 'last') {
+        var elements = document.querySelectorAll(config.selector);
+        if (elements) {
+            const results = [];
+            for (var i = 0; i < elements.length; i++) {
+                const element = elements[i];
+                if (config.render === 'text') {
+                    results.push(element.textContent.trim());
+                } else {
+                    results.push(element.innerHTML.trim());
+                }
+            }
+            if (results.length > 0) {
+                return results[results.length - 1];
+            }
+        }
+        return [];
     }
 };
 
 async function start() {
-    const instance = await phantom.create([], {logger: {}});
+    const instance = await phantom.create([], {
+        logger: config.debug? logger: {}
+    });
     const page = await instance.createPage();
     try {
         if (config.allowDomain) {
@@ -76,7 +142,7 @@ async function start() {
         const status = await page.open(config.url);
         assert.equal(status, 'success');
         const content = await page.property('content');
-        const text = await page.evaluate(querySelectorTextContentTrim, config.selector);
+        const text = await page.evaluate(querySelector, config);
         console.log(text);
     } catch (err) {
         console.error(err);
