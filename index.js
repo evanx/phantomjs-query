@@ -38,6 +38,12 @@ const configMeta = {
         description: 'output format',
         options: ['plain', 'indent']
     },
+    limit: {
+        required: false,
+        type: 'integer',
+        description: 'maximum number of elements',
+        example: 10
+    },
     level: {
         required: false,
         description: 'logging level',
@@ -54,7 +60,11 @@ const config = Object.keys(configMeta).reduce((config, key) => {
     if (process.env[key]) {
         const value = process.env[key];
         assert(value.length, key);
-        config[key] = value;
+        if (meta.type === 'integer') {
+            config[key] = parseInt(value);
+        } else {
+            config[key] = value;
+        }
     } else if (meta.default !== undefined) {
         config[key] = meta.default;
     } else {
@@ -110,7 +120,10 @@ const querySelector = function(config) {
         var elements = document.querySelectorAll(config.selector);
         if (elements) {
             const results = [];
-            for (var i = 0; i < elements.length; i++) {
+            const limit = config.limit && config.limit > 0?
+            Math.min(config.limit, elements.length)
+            : elements.length;
+            for (var i = 0; i < limit; i++) {
                 const element = elements[i];
                 if (config.type === 'text') {
                     results.push(element.textContent.trim());
@@ -118,7 +131,11 @@ const querySelector = function(config) {
                     results.push(element.innerHTML.trim());
                 }
             }
-            return results;
+            if (config.limit > 0 && results.length > config.limit) {
+                return results.slice(0, config.limit);
+            } else {
+                return results;
+            }
         }
     } else if (config.query === 'last') {
         var elements = document.querySelectorAll(config.selector);
@@ -140,7 +157,7 @@ const querySelector = function(config) {
     }
 };
 
-async function start() {
+async function main() {
     const instance = await phantom.create([], {
         logger: config.debug? logger: {}
     });
@@ -171,4 +188,4 @@ async function start() {
     }
 }
 
-start();
+main();

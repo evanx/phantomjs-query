@@ -7,13 +7,14 @@ A containerised utility to query HTML document elements using PhantomJS.
 
 ### Query element text
 
+For `document.querySelect()`
 ```javascript
-  docker run \
-    -e url='http://stackoverflow.com' \
-    -e selector='#hlogo' \
-    phantomjs-query
+docker run
+  -e url='http://stackoverflow.com' \
+  -e selector='#hlogo' \
+  phantomjs-query
 ```
-outputs
+where `selector` is configured. Outputs:
 ```
 Stack Overflow
 ```
@@ -22,9 +23,14 @@ Stack Overflow
 
 For `document.querySelectAll()` use `query='all'`
 ```
-$ docker run -e url='https://news.ycombinator.com/' -e selector='a.storylink' \
-  -e query='all' phantomjs-query | head
+docker run \
+  -e url='https://news.ycombinator.com/' \
+  -e selector='a.storylink' \
+  -e query='all' \
+  -e limit=3 \
+  phantomjs-query | head
 ```
+where the selector `a.storylink` on that URL gives an array which is output:
 ```
 Car allergic to vanilla ice cream (2000)
 Chernobyl's new sarcophagus
@@ -35,6 +41,19 @@ Cryptanalysis with Reasoning Systems
 Bootstrapping a slightly more secure [video]
 Stars may collide in a "red nova" in 2022
 ```
+
+For JSON output try:
+```
+docker run \
+  -e url='https://news.ycombinator.com/' \
+  -e selector='a.storylink' \
+  -e query='all' \
+  -e output='json' \
+  -e format='indent' \
+  -e limit=3 \  
+  phantomjs-query | head
+```
+where `format` may to omitted for `plain` JSON formatting
 
 ## Config
 
@@ -73,6 +92,12 @@ const configMeta = {
         description: 'output format',
         options: ['plain', 'indent']
     },
+    limit: {
+        required: false,
+        type: 'integer',
+        description: 'maximum number of elements',
+        example: 10
+    },
     level: {
         required: false,
         description: 'logging level',
@@ -88,51 +113,26 @@ const configMeta = {
 
 ## Implementation
 
-```javascript
-async function start() {
-    const instance = await phantom.create([], {logger: {}});
-    const page = await instance.createPage();
-    try {
-        if (config.allowDomain) {
-            page.property('onResourceRequested', onResourceRequestedAllowDomain, config.allowDomain);
-        }
-        const status = await page.open(config.url);
-        assert.equal(status, 'success');
-        const content = await page.property('content');
-        const text = await page.evaluate(querySelectorTextContentTrim, config.selector);
-        console.log(text);
-    } catch (err) {
-        console.error(err);
-    } finally {
-        await instance.exit();
-    }
-}
-```
-where requires environment variables `url` and `selector`
-```javascript
-const querySelectorTextContentTrim = function(selector) {
-    var element = document.querySelector(selector);
-    if (element) {
-        var text = element.textContent.trim();
-        if (text.length) {
-            return text;
-        }
-    }
-};
-```
+### Config
 
-Otherwise an error will be thrown e.g.
+If `required` configs with a `default` value are not specified via env vars, then an error will be thrown e.g.
 ```
 Error: Missing required config: 'url' for the URL to scrape e.g. 'http://stackoverflow.com'
 ```
 by
 ```javascript
 const config = Object.keys(configMeta).reduce((config, key) => {
+    const meta = configMeta[key];
     if (process.env[key]) {
         const value = process.env[key];
         assert(value.length, key);
-        config[key] = value;
-    } else if (configDefault[key]) {
+        if (meta.type === 'integer') {
+            config[key] = parseInt(value);
+        } else {
+            config[key] = value;
+        }
+    } else if (meta.default !== undefined) {
+        config[key] = meta.default;
     } else {
         const meta = configMeta[key];
         if (meta.required !== false) {
@@ -144,9 +144,55 @@ const config = Object.keys(configMeta).reduce((config, key) => {
         }
     }
     return config;
-}, configDefault);
+}, {});
 ```
 
+### Main
+
+```javascript
+async function main() {
+    const instance = await phantom.create([], {logger: {}});
+    const page = await instance.createPage();
+    try {
+        if (config.allowDomain) {
+            page.property('onResourceRequested', onResourceRequestedAllowDomain, config.allowDomain);
+        }
+        const status = await page.open(config.url);
+        assert.equal(status, 'success');
+        const content = await page.property('content');
+        const text = await page.evaluate(querySelector, config);
+        console.log(text);
+    } catch (err) {
+        console.error(err);
+    } finally {
+        await instance.exit();
+    }
+}
+```
+where `querySelector` is implemented as follows:
+```javascript
+const querySelector = function(config) {
+    if (config.query === 'first') {
+        var element = document.querySelector(config.selector);
+        if (element) {
+            if (config.type === 'text') {
+                var text = element.textContent.trim();
+                if (text.length) {
+                    return text;
+                }
+            } else if (config.type === 'html') {
+                return element.innerHTML.trim();
+            }
+        }
+    } else if (config.query === 'all') {
+        var elements = document.querySelectorAll(config.selector);
+        if (elements) {
+            ...
+            return results;
+        }
+    } else if (config.query === 'last') {
+        ...
+```
 
 ## Build application container
 
@@ -164,7 +210,6 @@ RUN npm install
 ADD index.js .
 CMD ["node", "--harmony", "index.js"]
 ```
-
 
 ## Docker run
 
@@ -187,3 +232,13 @@ where this is the text context of the element for selector `#hlogo`
 </div>
 ```
 via `http://stackoverflow.com`
+
+## Development
+
+When using `git clone` then after `npm install` use `npm start`
+```
+NODE_ENV=development \
+  url='https://news.ycombinator.com/' \
+  selector='a.storylink' query='all' limit=10 \
+  npm start
+```
