@@ -142,8 +142,12 @@ async function start() {
         const status = await page.open(config.url);
         assert.equal(status, 'success');
         const content = await page.property('content');
-        const text = await page.evaluate(querySelector, config);
-        console.log(text);
+        const results = await page.evaluate(querySelector, config);
+        if (lodash.isArray(results)) {
+            console.log(results.length);
+        } else {
+            console.log(results);
+        }
     } catch (err) {
         console.error(err);
     } finally {
