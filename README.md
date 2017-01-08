@@ -60,20 +60,10 @@ docker run \
 ```
 where `format` may to omitted for `plain` JSON formatting
 
-The above tests algother via `test.sh`
-```shell
-  docker build -t phantomjs-query https://github.com/evanx/phantomjs-query.git
-  docker run phantomjs-query bash test.sh   
+Altogether see https://github.com/evanx/phantomjs-query/blob/master/test.sh
 ```
-
-Alternatively
-```
-  git clone https://github.com/evanx/phantomjs-query &&
-  cd phantomjs-query &&
-  npm install &&
-  bash -x test.sh
-```
-See https://github.com/evanx/phantomjs-query/blob/master/test.sh
+curl https://github.com/evanx/phantomjs-query/blob/master/test.sh | bash -x
+````
 
 ## Config
 
