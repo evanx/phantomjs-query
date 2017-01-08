@@ -10,6 +10,11 @@ Build docker image from Github repo
 docker build -t phantomjs-query https://github.com/evanx/phantomjs-query.git
 ```
 
+Alternatively, use my image `evanxsummers/phantomjs-query` on DockerHub:
+```
+docker run -e url='http://news.ycombinator.com' -e selector='a.storylink' evanxsummers/phantomjs-query
+```
+
 ### Query element text
 
 For `document.querySelect()`
