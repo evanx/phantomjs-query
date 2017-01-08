@@ -39,12 +39,7 @@ where the selector `a.storylink` on that URL gives an array which is output:
 ```
 Car allergic to vanilla ice cream (2000)
 Chernobyl's new sarcophagus
-Challenging Clojure in Common Lisp
-Memory Deduplication: The Curse that Keeps on Giving [video]
-GitHub Enterprise SQL Injection
 Cryptanalysis with Reasoning Systems
-Bootstrapping a slightly more secure [video]
-Stars may collide in a "red nova" in 2022
 ```
 
 For JSON output try:
@@ -58,7 +53,15 @@ docker run \
   -e limit=3 \  
   phantomjs-query | head
 ```
-where `format` may to omitted for `plain` JSON formatting
+where `format='indent'` pretty prints:
+```
+[
+  "Car allergic to vanilla ice cream (2000)",
+  "Chernobyl’s new sarcophagus",
+  "Cryptanalysis with Reasoning Systems"
+]
+```
+Note that `format` may to omitted for `plain` JSON formatting
 
 Altogether, see https://raw.githubusercontent.com/evanx/phantomjs-query/master/test.sh
 ```
