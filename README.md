@@ -60,9 +60,9 @@ docker run \
 ```
 where `format` may to omitted for `plain` JSON formatting
 
-Altogether see https://github.com/evanx/phantomjs-query/blob/master/test.sh
+Altogether, see https://raw.githubusercontent.com/evanx/phantomjs-query/master/test.sh
 ```
-curl https://github.com/evanx/phantomjs-query/blob/master/test.sh | bash -x
+curl -s https://raw.githubusercontent.com/evanx/phantomjs-query/master/test.sh | bash -x
 ````
 
 ## Config
